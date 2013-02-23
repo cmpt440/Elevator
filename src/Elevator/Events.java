@@ -1,10 +1,4 @@
-//changes demonstrated
-//<<<<<<< HEAD
-//David Added this line
-//new change
-//=======
-///David Added this line
-//>>>>>>> efc6b4114a50abcf63bb5bb634644e19934f92ee
+//after tesing
 /*
  * Created by: Christopher Feveck
  * Purpose: To create the simulate the events of the elevator and the people
