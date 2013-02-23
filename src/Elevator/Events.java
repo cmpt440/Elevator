@@ -1,6 +1,6 @@
 //changes demonstrated
 //David Added this line
-//new chane
+//new change
 /*
  * Created by: Christopher Feveck
  * Purpose: To create the simulate the events of the elevator and the people
