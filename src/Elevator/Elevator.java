@@ -1,5 +1,4 @@
-/*a chane by chris
- * this is chanfged
+/*
  * Created by: Christopher Feveck
  * Purpose: To create an elevator class with the dimensions of the elevator
  * Note: The people on the floors wait in a link list. 
