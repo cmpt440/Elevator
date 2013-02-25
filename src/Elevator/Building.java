@@ -102,7 +102,7 @@ public class Building
         return building_height;
     }
     
-    
+    /*
     public static void main(String[] args)
     {
         Building building=new Building();
@@ -113,7 +113,7 @@ public class Building
         System.out.println(building.get_building_height());
         
     }
-    
+    */
      
     
 }
