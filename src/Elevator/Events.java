@@ -32,7 +32,7 @@ public class Events
     public Events()
     {
         sim_tick = 0;
-e_algorithm_type = 1;
+        e_algorithm_type = 1;
         p_queue=new PriorityQueue<Object>();
         this.tick=1;
         building_floors = new LinkedList[floors];
