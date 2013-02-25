@@ -36,12 +36,10 @@ e_algorithm_type = 1;
         p_queue=new PriorityQueue<Object>();
         this.tick=1;
         building_floors = new LinkedList[floors];
-        //building_floors = (LinkedList<Person>[]) new LinkedList[floors];
         for(int x=0; x<floors;x++)
         {
             building_floors[x] = new LinkedList<Person>();
         }
-        //this.class_type="elevator";
     }
     
     //object that creates a person object that moves in the elevator
