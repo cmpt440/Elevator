@@ -7,7 +7,7 @@ package Elevator;
 
 /**
  *
- * David Flemming 8:04 pm
+ * Nafy 8:04 pm
  */
 public class Create_class implements Comparable
 {
