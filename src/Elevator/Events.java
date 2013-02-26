@@ -19,6 +19,9 @@ public class Events
     private LinkedList[] building_floors;
     
     //speed of elevator
+    //1 tick= 15 sec (default for ELEVATOR TICK) 
+    //This is a cahngeable parameter so it can be 30 sec per tick or w/e
+    //Velocity caluclation: how many ticks does it take to reach its destination
     private int elevator_tick=3;
     //arrival of people
     private int people_tick=2;
@@ -29,6 +32,8 @@ public class Events
     
     //Sets the idle location of the elevator
     //THIS IS AN INPUT VARIABLE tweak it to take input
+    //Create an output message for the IDLE variable as it is an output 
+    //parameter
     private int idle=0;
     private int e_algorithm_type;
     
