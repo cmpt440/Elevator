@@ -18,12 +18,13 @@ public class Elevator implements Comparable
     private PriorityQueue <Object> requestQueue;
     private LinkedList <Object> elev_persons;
     
-    public Elevator(int tick, int floors)
+    public Elevator(int tick, int floors, int currentFloor)
     {
+        this.currentFloor=currentFloor;
         this.tick = tick;
         this.amt_elevators=1;
         direction = true;
-        this.floors = floors;
+        this.floors = floors;       
         requestQueue = new PriorityQueue<Object>();
         elev_persons= new LinkedList <Object>();
     }
@@ -63,14 +64,7 @@ public class Elevator implements Comparable
     public void Set_Persons(Person person)
     {
         elev_persons.add(person);
-    }
-    
-    /*
-    public Request Get_Request()
-    {
-        return (Request)requestQueue.peek();
-    }
-    * */
+    }    
     
     public boolean Increment()
     {
@@ -111,11 +105,12 @@ public class Elevator implements Comparable
     {
         return direction;
     }
+    /*
     public void Set_CurrentFloor(int currentFloor)
     {
         this.currentFloor = currentFloor;
     }
-    
+    */
     public int Get_CurrentFloor()
     {
         return currentFloor;

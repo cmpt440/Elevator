@@ -27,12 +27,15 @@ public class Events
     private int tick;
     private String class_type;
     
+    //Sets the idle location of the elevator
+    //THIS IS AN INPUT VARIABLE tweak it to take input
+    private int idle=0;
     private int e_algorithm_type;
     
     public Events()
     {
         sim_tick = 0;
-        e_algorithm_type = 1;
+        e_algorithm_type = 0;
         p_queue=new PriorityQueue<Object>();
         this.tick=1;
         building_floors = new LinkedList[floors];
@@ -145,7 +148,7 @@ public class Events
     }
     public void start()            
     {
-        p_queue.add(new Elevator(elevator_tick,floors));
+        p_queue.add(new Elevator(elevator_tick,floors, idle));
         p_queue.add(new Create_class("people", people_tick));
         Object obj;
         
@@ -156,6 +159,7 @@ public class Events
             if(obj instanceof Elevator)
             {
                     sim_tick = ((Elevator)obj).get_tick();
+                    //((Elevator)obj).Set_CurrentFloor(5);
                     
                     switch(e_algorithm_type)
                     {
@@ -170,10 +174,11 @@ public class Events
                             collective_up_collective_down(obj);
                             break;
                     }
-((Elevator)obj).set_tick(((Elevator)obj).get_tick()+elevator_tick);
+                    
+                    ((Elevator)obj).set_tick(((Elevator)obj).get_tick()+elevator_tick);
                     
 
-//picks/drop the people                        
+                    //picks/drop the people                        
                     Iterator iter = ((Elevator)obj).Get_RequestIterator();
                     
                     //Request elevReqs;
@@ -185,7 +190,8 @@ public class Events
                         {
                             elevReqs = (Request)iter.next();
                         }
-                        catch(Exception e){
+                        catch(Exception e)
+                        {
                             break;
                         }
                         
@@ -405,13 +411,13 @@ personRequest.set_from_floor_request(((Person)obj).get_current_floor());
 //building_floors[((Person)obj).get_destination_floor()].add(((Person)obj));
 building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Person)obj));                    
                     
-                    System.out.println("Person waiting time:"+((Person)obj).get_tick()+", destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());
+                   // System.out.println("Person waiting time:"+((Person)obj).get_tick()+", destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());
                     
                     
                     
                     
                     //after request is added                                         
-                    System.out.println("People time:"+((Person)obj).get_tick())                ;
+                    //System.out.println("People time:"+((Person)obj).get_tick())                ;
             }
             else if(obj instanceof Create_class)
             {
