@@ -12,6 +12,8 @@
  */
 package Elevator;
 import java.util.*;
+import java.util.Random;
+
 public class Events 
 {
     private PriorityQueue<Object> p_queue;
@@ -145,6 +147,21 @@ e_algorithm_type = 1;
                     }   
         
     }
+    
+    
+    //method to generate random number
+    int random_generator(int num_to_avoid)
+    {
+        int random=(int) (Math.random()* (building_floors.length +1));
+        
+        if (random == num_to_avoid)
+        {
+            random_generator(num_to_avoid);
+        }
+        return random;
+    }
+    
+    
     public void start()            
     {
         p_queue.add(new Elevator(elevator_tick,floors));
@@ -337,7 +354,14 @@ while(it1.hasNext())
 
 
                             }
-
+                //floor traffic          
+                for(int i=0;i<=6;i++)
+                    {
+                      System.out.println("Traffic on floor "+ i+": "+building_floors[i].size());
+                    }
+                //elevator traffic
+                System.out.println("Elevator currently contains : "+((Elevator)obj).Get_PersonsLinkedList().size());
+                
                             //drop person off
                             if((elevReqs.get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor()) &&
                                     (((Elevator)obj).Get_PersonsLinkedList().size() > 0))
@@ -385,8 +409,15 @@ while(it1.hasNext())
                     sim_tick = ((Person)obj).get_tick();
                     
                     Request personRequest= new Request( ((Person)obj).get_tick());
-personRequest.set_to_floor_request(4);
-personRequest.set_from_floor_request(((Person)obj).get_current_floor());
+                    //set the person's destination floor
+                    int request_floor;
+                    request_floor=(int) (Math.random()* (building_floors.length +1));
+                    personRequest.set_to_floor_request(request_floor);
+                    //sets the person's spawning floor
+                    int start_floor;
+                    start_floor=random_generator(request_floor);
+                   
+                    personRequest.set_from_floor_request(((Person)obj).get_current_floor());
 //personRequest.set_from_floor_request(2);                    
                     //if the current floor less than destination floor this means that the direction is up
                     if(personRequest.get_from_floor_request() < personRequest.get_to_floor_request())
@@ -405,9 +436,9 @@ personRequest.set_from_floor_request(((Person)obj).get_current_floor());
                     p_queue.add(elevRequest);
                     //put person on the floor linklist
 //building_floors[((Person)obj).get_destination_floor()].add(((Person)obj));
-building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Person)obj));                    
-                    
-                    System.out.println("Person waiting time:"+((Person)obj).get_tick()+", destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());
+                building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Person)obj));//after request is added                                         
+                System.out.println("People time:"+((Person)obj).get_tick());
+                System.out.println("Person waiting time:"+((Person)obj).get_tick()+", destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());                    
                     
                     
                     
@@ -415,13 +446,17 @@ building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Pers
                     //after request is added                                         
                     System.out.println("People time:"+((Person)obj).get_tick())                ;
             }
+            
+               
+                
+   
             else if(obj instanceof Create_class)
             {
                 if(((Create_class)obj).get_class_type().compareTo("people") == 0)
                 {
                     sim_tick = ((Create_class)obj).get_tick();
                     
-p_queue.add(new Person(sim_tick,2));
+                    p_queue.add(new Person(sim_tick,2));
                     ((Create_class)obj).set_tick(sim_tick+people_tick);
                     p_queue.add(obj);
 
