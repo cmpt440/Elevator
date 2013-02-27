@@ -10,40 +10,82 @@
  * added to the already existing number 2 so the add_person will be 
  * add_person-4
  */
+
+
 package Elevator;
 import java.util.*;
 public class Events 
 {
+ /******************************************************************************
+ * TODO LIST:
+ * Implement elevator capacity
+ * pick up delay 
+ * exponential for people floor arrival
+ * uniform for people going to floor
+ * these are from infile parsing
+ */
+    //DISTRIBUTION BUSINESS
+    private int exponential=0;
+    //FLOOR DISTRIBUTION
+    private int dropofffloor = 3;
+ //*****************************************************************************
+    
     private PriorityQueue<Object> p_queue;
     private int sim_tick;
     private LinkedList[] building_floors;
+    
+    
+    
     
     //speed of elevator
     //1 tick= 15 sec (default for ELEVATOR TICK) 
     //This is a cahngeable parameter so it can be 30 sec per tick or w/e
     //Velocity caluclation: how many ticks does it take to reach its destination
-    private int elevator_tick=3;
+    private int elevator_tick;
+    //The floor a person is delivered upon creation
+    private int placeofbirth;
+    //delay when dropping / pickup
+    private int pick_up_delay;
     //arrival of people
-    private int people_tick=2;
+    private int people_tick;
     //number of floors
-    private int floors = 7;   
+    private int floors;   
     private int tick;
+    private int elevators;
     private String class_type;
     
     //Sets the idle location of the elevator
     //THIS IS AN INPUT VARIABLE tweak it to take input
     //Create an output message for the IDLE variable as it is an output 
     //parameter
-    private int idle=0;
+    private int idle;
     private int e_algorithm_type;
+    private Infile infile;
     
-    public Events()
+    
+    
+    public Events(String file_name)
     {
+        infile=new Infile(file_name);
+        infile.get_data();
+        
+        e_algorithm_type = infile.get_algorithm();
+        elevator_tick=infile.get_speed();
+        building_floors = new LinkedList[infile.get_floors()];
+        floors=infile.get_floors();
+        people_tick=infile.get_birth_of_person();
+        elevators=infile.get_elevators();
+        placeofbirth=infile.get_place_of_birth()-1;
+        pick_up_delay = infile.get_pic_up_delay();
+        
+        idle=infile.get_idle()-1;
+        //ELEVATOR CAPACITY
+        //PICK UP DELAY
+        
         sim_tick = 0;
-        e_algorithm_type = 0;
         p_queue=new PriorityQueue<Object>();
         this.tick=1;
-        building_floors = new LinkedList[floors];
+        
         for(int x=0; x<floors;x++)
         {
             building_floors[x] = new LinkedList<Person>();
@@ -111,6 +153,7 @@ public class Events
                         {
                             ((Elevator)obj).Decrement();
                         }
+                        
                     }
                     
                     
@@ -118,15 +161,20 @@ public class Events
                     {
                         //get the requests list
                         Iterator ite = ((Elevator)obj).Get_RequestIterator();
+                        if (((Elevator)obj).Get_RequestQueue().size() == 0)
+                            lowest = infile.get_floors();
                         while(ite.hasNext())
                         {
+                            Request req = ((Request)ite.next());
                             //check for the lowest request
-                            if(((Request)ite.next()).get_from_floor_request() < lowest)
+                            if(req.get_from_floor_request() < lowest)
                             {
                                 //set the lowest request
-                                lowest = ((Request)ite.next()).get_from_floor_request();
+                                lowest = req.get_from_floor_request();
                             }
                         }
+                        if (((Elevator)obj).Get_RequestQueue().size() == 0)
+                            lowest = 0;
                         
                         //keep going down until reach the lowest requested floor
                         if(((Elevator)obj).Get_CurrentFloor() > lowest)
@@ -153,7 +201,12 @@ public class Events
     }
     public void start()            
     {
-        p_queue.add(new Elevator(elevator_tick,floors, idle));
+        for(int i=0;i<elevators;i++)
+        {
+            p_queue.add(new Elevator(elevator_tick,floors, idle));
+            
+        }
+        
         p_queue.add(new Create_class("people", people_tick));
         Object obj;
         
@@ -219,6 +272,9 @@ public class Events
                                         tmpPer = (Person)iterf.next();
                                         if(tmpPer.get_request().get_from_floor_request() == ((Elevator)obj).Get_CurrentFloor())
                                         {
+                                            //set the delay for pickup of person
+                                            ((Elevator)obj).set_tick(((Elevator)obj).get_tick()+pick_up_delay);
+                                            
                                             ((Elevator)obj).Set_Persons(tmpPer);
                                             iterf.remove();
                                         }
@@ -246,6 +302,9 @@ public class Events
                                         tmpPer = (Person)iterf.next();
                                         if(tmpPer.get_request().get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor())
                                         {
+                                            //set the delay for pickup of person
+                                            ((Elevator)obj).set_tick(((Elevator)obj).get_tick()+pick_up_delay);
+                                            
                                              this.building_floors[((Elevator)obj).Get_CurrentFloor()].add(tmpPer);
                                             iterf.remove();
                                         }
@@ -334,9 +393,13 @@ while(it1.hasNext())
             ((Elevator)obj).Set_Request((Request)ob);
             it1.remove();
             
+            
         }
     }
 }
+                                            //set the delay for pickup of person
+                                            ((Elevator)obj).set_tick(((Elevator)obj).get_tick()+pick_up_delay);
+                                            
                                             ((Elevator)obj).Set_Persons(tmpPer);
                                             iterf.remove();
                                         }
@@ -347,6 +410,8 @@ while(it1.hasNext())
 
                             }
 
+                            
+                            
                             //drop person off
                             if((elevReqs.get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor()) &&
                                     (((Elevator)obj).Get_PersonsLinkedList().size() > 0))
@@ -364,9 +429,15 @@ while(it1.hasNext())
                                         tmpPer = (Person)iterf.next();
                                         if(tmpPer.get_request().get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor())
                                         {
+                                            //set the delay for pickup of person
+                                            ((Elevator)obj).set_tick(((Elevator)obj).get_tick()+pick_up_delay);
+                                            
                                              this.building_floors[((Elevator)obj).Get_CurrentFloor()].add(tmpPer);
                                             iterf.remove();
-                                            ((Elevator)obj).Remove_Request();
+                                            
+//need to find a matching request to be removed for that floor
+((Elevator)obj).Remove_Request();
+//********************************************
                                         }
                                         tmpPer = null;
                                     
@@ -377,6 +448,9 @@ while(it1.hasNext())
                             
                             
                         }
+                        
+                        
+                        
                     }
 //*************************                            
 
@@ -387,14 +461,19 @@ while(it1.hasNext())
                         
                         
                     p_queue.add(obj);
-                    System.out.println("Elevator time:"+((Elevator)obj).get_tick()+", direction: "+((Elevator)obj).Get_direction() + ", Floor:"+((Elevator)obj).Get_CurrentFloor());                ;
+System.out.println("Elevator time:"+((Elevator)obj).get_tick()+", direction: "+((Elevator)obj).Get_direction() + ", Floor:"+((Elevator)obj).Get_CurrentFloor());                ;
             }
             if(obj instanceof Person)
             {
                     sim_tick = ((Person)obj).get_tick();
                     
                     Request personRequest= new Request( ((Person)obj).get_tick());
-personRequest.set_to_floor_request(4);
+
+personRequest.set_to_floor_request(dropofffloor);
+
+
+
+
 personRequest.set_from_floor_request(((Person)obj).get_current_floor());
 //personRequest.set_from_floor_request(2);                    
                     //if the current floor less than destination floor this means that the direction is up
@@ -430,7 +509,7 @@ building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Pers
                 {
                     sim_tick = ((Create_class)obj).get_tick();
                     
-p_queue.add(new Person(sim_tick,2));
+p_queue.add(new Person(sim_tick+exponential,placeofbirth));
                     ((Create_class)obj).set_tick(sim_tick+people_tick);
                     p_queue.add(obj);
 
@@ -472,8 +551,8 @@ p_queue.add(new Person(sim_tick,2));
                             }
                             else
                             {
-                                ((Request)obj).set_tick(sim_tick+elevator_tick);
-
+                                //((Request)obj).set_tick(sim_tick+elevator_tick);
+                                ((Request)obj).set_tick(((Request)obj).get_tick()+elevator_tick);
 p_queue.add((Request)obj);
                             }
                         }
@@ -488,7 +567,7 @@ p_queue.add((Request)obj);
 
     public static void main(String[] args)
     {
-        new Events().start();
+        new Events("textfile.txt").start();
     
     }
     

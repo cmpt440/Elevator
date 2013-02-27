@@ -15,12 +15,16 @@ public class Elevator implements Comparable
     private int currentFloor;
     private boolean direction;
     private int floors;
+    //idle floor of the elevator
+    private int idle;
     private PriorityQueue <Object> requestQueue;
     private LinkedList <Object> elev_persons;
     
-    public Elevator(int tick, int floors, int currentFloor)
+    public Elevator(int tick, int floors, int idle)
     {
-        this.currentFloor=currentFloor;
+        this.currentFloor=idle;
+        //set the idle floor
+        this.idle=idle;
         this.tick = tick;
         this.amt_elevators=1;
         direction = true;
@@ -29,9 +33,19 @@ public class Elevator implements Comparable
         elev_persons= new LinkedList <Object>();
     }
 
+    public int get_idle_floor()
+    {
+        return idle;
+    }
+    
     public Iterator Get_RequestIterator()
     {
         return requestQueue.iterator();
+    }
+    
+    public PriorityQueue Get_RequestQueue()
+    {
+        return requestQueue;
     }
     
     public LinkedList Get_PersonsLinkedList()

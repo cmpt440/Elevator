@@ -1,0 +1,1 @@
+-ElevatorCapacity 10 -Speed 1 -Idle 1 -PickupDelay 3 -Elevators 1 -Floors 4 -Algorithm 1 -BirthOfPerson 3 -PlaceOfBirth 2
