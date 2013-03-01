@@ -116,11 +116,12 @@ e_algorithm_type = 1;
                         Iterator ite = ((Elevator)obj).Get_RequestIterator();
                         while(ite.hasNext())
                         {
+                            Request req = (Request)ite.next();
                             //check for the lowest request
-                            if(((Request)ite.next()).get_from_floor_request() < lowest)
+                            if(req.get_from_floor_request() < lowest)
                             {
                                 //set the lowest request
-                                lowest = ((Request)ite.next()).get_from_floor_request();
+                                lowest = req.get_from_floor_request();
                             }
                         }
                         
@@ -152,7 +153,8 @@ e_algorithm_type = 1;
     //method to generate random number
     int random_generator(int num_to_avoid)
     {
-        int random=(int) (Math.random()* (building_floors.length +1));
+        Random ran = new Random();
+        int random= ran.nextInt(building_floors.length-1)+1;
         
         if (random == num_to_avoid)
         {
@@ -345,7 +347,12 @@ while(it1.hasNext())
         }
     }
 }
-                                            ((Elevator)obj).Set_Persons(tmpPer);
+
+System.out.println("Elevator arrived at: "+((Elevator)obj).get_tick());
+System.out.println("Request was made at: "+ tmpPer.get_request().get_tick());
+System.out.println("Person waiting time: "+(((Elevator)obj).get_tick()-tmpPer.get_request().get_tick()));
+
+((Elevator)obj).Set_Persons(tmpPer);
                                             iterf.remove();
                                         }
                                         tmpPer = null;
@@ -411,14 +418,17 @@ while(it1.hasNext())
                     Request personRequest= new Request( ((Person)obj).get_tick());
                     //set the person's destination floor
                     int request_floor;
-                    request_floor=(int) (Math.random()* (building_floors.length +1));
+                    //randomly picks a number between 0 and the max num of floors
+                    Random ran = new Random();
+                    request_floor=ran.nextInt(building_floors.length-1)+1; // * (building_floors.length -1));
                     personRequest.set_to_floor_request(request_floor);
                     //sets the person's spawning floor
                     int start_floor;
                     start_floor=random_generator(request_floor);
-                   
-                    personRequest.set_from_floor_request(((Person)obj).get_current_floor());
-//personRequest.set_from_floor_request(2);                    
+                    
+                    personRequest.set_from_floor_request(start_floor);
+                    //sets the random floor location for spawning but now working
+                    //personRequest.set_from_floor_request(start_floor);                    
                     //if the current floor less than destination floor this means that the direction is up
                     if(personRequest.get_from_floor_request() < personRequest.get_to_floor_request())
                     {
@@ -436,9 +446,11 @@ while(it1.hasNext())
                     p_queue.add(elevRequest);
                     //put person on the floor linklist
 //building_floors[((Person)obj).get_destination_floor()].add(((Person)obj));
-                building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Person)obj));//after request is added                                         
+
+                    building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Person)obj));//after request is added                                         
+                    
                 System.out.println("People time:"+((Person)obj).get_tick());
-                System.out.println("Person waiting time:"+((Person)obj).get_tick()+", destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());                    
+                System.out.println(" destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());                    
                     
                     
                     
