@@ -133,7 +133,7 @@ building_floors = new LinkedList[infile.get_floors()];
     //output stats
     public int get_Average_person_wait_time()
     {
-        return wait_time;
+        return wait_time/divisor_for_average;
     }
     
     private void collective_up_collective_down(Object obj)
@@ -595,7 +595,7 @@ p_queue.add((Request)obj);
 //</editor-fold>                 
             }
         }
-        System.out.println("wait time average "+wait_time/divisor_for_average+" ticks");
+        System.out.println("wait time average "+this.get_Average_person_wait_time()+" ticks");
     }
          
 
