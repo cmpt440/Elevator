@@ -20,7 +20,7 @@ public class Events
 {
     private PriorityQueue<Object> p_queue;
     private int sim_tick;
-    private LinkedList[] building_floors;
+    private LinkedList[] building_floors;    
     
     //speed of elevator
     private int elevator_tick;
@@ -33,6 +33,9 @@ public class Events
     
     private int wait_time;
     private int divisor_for_average;
+    private int onloaded_tick;
+    private int unloaded_tick;
+    private int divisor_for_intransit_tick;
     
     private int e_algorithm_type;
     private Infile infile;
@@ -76,6 +79,9 @@ public class Events
         
         wait_time=0;
         divisor_for_average=1;
+        onloaded_tick=0;
+        unloaded_tick=0;
+        divisor_for_intransit_tick=1;
         
         people_tick=infile.get_birth_of_person();
         elevators=infile.get_elevators();
@@ -106,6 +112,10 @@ public class Events
     public int get_num_ticks()
     {
         return this.num_of_ticks;
+    }
+    public int get_average_intransit_tick()
+    {
+        return (this.unloaded_tick-this.onloaded_tick)/divisor_for_intransit_tick;
     }
     //object that creates a person object that moves in the elevator
     public void set_floor_person_list(int floor, Person obj)
@@ -141,7 +151,7 @@ public class Events
     //output stats
     public int get_Average_person_wait_time()
     {
-        return wait_time/divisor_for_average;
+        return Math.abs(wait_time/divisor_for_average);
     }
     
     private void collective_up_collective_down(Object obj)
@@ -260,7 +270,7 @@ public class Events
                             collective_up_collective_down(obj);
                             break;
                     }
-((Elevator)obj).set_tick(((Elevator)obj).get_tick()+elevator_tick);
+                    ((Elevator)obj).set_tick(((Elevator)obj).get_tick()+elevator_tick);
                     
 
 //picks/drop the people                        
@@ -298,7 +308,9 @@ public class Events
                                         tmpPer = (Person)iterf.next();
                                         if(tmpPer.get_request().get_from_floor_request() == ((Elevator)obj).Get_CurrentFloor())
                                         {
+                                            
                                             ((Elevator)obj).Set_Persons(tmpPer);
+                                            
                                             iterf.remove();
                                         }
                                         tmpPer = null;
@@ -309,8 +321,7 @@ public class Events
                             }
                             
                             //drop person off
-                            if((elevReqs.get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor()) &&
-                                    (((Elevator)obj).Get_PersonsLinkedList().size() > 0))
+                            if((elevReqs.get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor()) && (((Elevator)obj).Get_PersonsLinkedList().size() > 0))
                             {
                                 Iterator iterf;
                                 iterf = ((Elevator)obj).Get_PersonsIterator();
@@ -499,16 +510,16 @@ divisor_for_average++;
                     
                     Request personRequest= new Request( ((Person)obj).get_tick());
                     //set the person's destination floor
-                    int request_floor;
+                    //int request_floor;
                     //randomly picks a number between 0 and the max num of floors
                     Random ran = new Random();
-                    request_floor=ran.nextInt(building_floors.length-1)+1; // * (building_floors.length -1));
-                    personRequest.set_to_floor_request(request_floor);
+                    dropofffloor=ran.nextInt(building_floors.length-1); // * (building_floors.length -1));
+                    personRequest.set_to_floor_request(dropofffloor);
                     //sets the person's spawning floor
-                    int start_floor;
-                    start_floor=random_generator(request_floor);
                     
-                    personRequest.set_from_floor_request(start_floor);
+                    //placeofbirth=random_generator(dropofffloor);
+                    
+                    personRequest.set_from_floor_request(placeofbirth);
                     //sets the random floor location for spawning but now working
                     //personRequest.set_from_floor_request(start_floor);                    
                     //if the current floor less than destination floor this means that the direction is up
@@ -601,7 +612,8 @@ divisor_for_average++;
         System.out.println("***************************************************");
         System.out.println("\nResults:");
         event.start();   
-        System.out.println("wait time average "+event.get_Average_person_wait_time()+" ticks");
+        System.out.println("wait time average "+event.get_Average_person_wait_time()+" ticks.\n"+"Onloaded tick: "+event.get_average_intransit_tick());
+        
     }
     
     
