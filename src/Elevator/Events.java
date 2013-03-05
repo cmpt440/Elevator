@@ -612,7 +612,9 @@ divisor_for_average++;
         System.out.println("***************************************************");
         System.out.println("\nResults:");
         event.start();   
-        System.out.println("wait time average "+event.get_Average_person_wait_time()+" ticks.\n"+"Onloaded tick: "+event.get_average_intransit_tick());
+        System.out.println("Average wait time for elevator:\n"
+                + " "+event.get_Average_person_wait_time()+" ticks.\n"+" Using:"+args[1]+" ticks.\n"
+                + ""+"Onloaded tick: "+event.get_average_intransit_tick());
         
     }
     
