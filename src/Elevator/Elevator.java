@@ -28,6 +28,11 @@ public class Elevator implements Comparable
         elev_persons= new LinkedList <Object>();
     }
 
+    public PriorityQueue Get_RequestQueue()
+    {
+        return requestQueue;
+    }
+    
     public Iterator Get_RequestIterator()
     {
         return requestQueue.iterator();

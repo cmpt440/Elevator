@@ -12,7 +12,12 @@
  */
 package Elevator;
 import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.util.Random;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.*;
 
 public class Events 
 {
@@ -30,15 +35,52 @@ public class Events
     private String class_type;
     
     private int e_algorithm_type;
+    private Infile infile;
     
-    public Events()
+    Random rand=new Random();
+    private int dropofffloor;
+    private int elevators;
+    
+    //The floor a person is delivered upon creation
+    private int placeofbirth;
+    //delay when dropping / pickup
+    private int pick_up_delay;
+    //Sets the idle location of the elevator
+    //THIS IS AN INPUT VARIABLE tweak it to take input
+    //Create an output message for the IDLE variable as it is an output 
+    //parameter
+    private int idle;
+    
+    public Events(String file_name)
     {
+        infile=new Infile(file_name);
+        infile.get_data();
+        
         sim_tick = 0;
-e_algorithm_type = 1;
+e_algorithm_type = infile.get_algorithm();
+elevator_tick=infile.get_speed();
+building_floors = new LinkedList[infile.get_floors()];
+        floors=infile.get_floors();
+        
+        //NEED TO EDIT
+        dropofffloor= rand.nextInt(floors);
+        
+        people_tick=infile.get_birth_of_person();
+        elevators=infile.get_elevators();
+        placeofbirth=infile.get_place_of_birth()-1;
+        pick_up_delay = infile.get_pic_up_delay();
+        
+        idle=infile.get_idle()-1;
+        //ELEVATOR CAPACITY
+        //PICK UP DELAY
+        
+        sim_tick = 0;
+        
         p_queue=new PriorityQueue<Object>();
         this.tick=1;
-        building_floors = new LinkedList[floors];
-        //building_floors = (LinkedList<Person>[]) new LinkedList[floors];
+        
+        
+        
         for(int x=0; x<floors;x++)
         {
             building_floors[x] = new LinkedList<Person>();
@@ -114,6 +156,8 @@ e_algorithm_type = 1;
                     {
                         //get the requests list
                         Iterator ite = ((Elevator)obj).Get_RequestIterator();
+                        if (((Elevator)obj).Get_RequestQueue().size() == 0)
+                            lowest = infile.get_floors();
                         while(ite.hasNext())
                         {
                             Request req = (Request)ite.next();
@@ -349,9 +393,107 @@ while(it1.hasNext())
 }
 
 System.out.println("Elevator arrived at: "+((Elevator)obj).get_tick());
+/*
+try
+{
+    String content = Integer.toString(((Elevator)obj).get_tick());
+    File file = new File("Datafile",true);
+    if (!file.exists()) 
+    {
+				
+        file.createNewFile();
+	FileWriter fw = new FileWriter(file.getAbsoluteFile());
+	BufferedWriter bw = new BufferedWriter(fw);
+	
+	while(file)
+	{
+        	bw.write("Elevator arrived at: "+content);
+	}
+ 
+        System.out.println("Data written to file");		
+    }
+    else
+    {
+	FileWriter fw = new FileWriter(file.getAbsoluteFile());
+	BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(content);
+	
+ 
+        System.out.println("Data written to file");
+        
+    }
+}
+catch(IOException e)
+{
+    System.err.println("Error: " + e.getMessage());
+}
+ */
 System.out.println("Request was made at: "+ tmpPer.get_request().get_tick());
-System.out.println("Person waiting time: "+(((Elevator)obj).get_tick()-tmpPer.get_request().get_tick()));
+try
+{
+    String content = Integer.toString(tmpPer.get_request().get_tick());
+    File file = new File("Datafile");
+    if (!file.exists()) 
+    {
+				
+        file.createNewFile();
+	FileWriter fw = new FileWriter(file.getAbsoluteFile());
+	BufferedWriter bw = new BufferedWriter(fw);
+        bw.write("Request was made at: "+content);
+	
+        System.out.println("Data written to file");		
+    }
+    else
+    {
+	FileWriter fw = new FileWriter(file.getAbsoluteFile());
+	BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(content);
+	
 
+        
+    }
+}
+catch(IOException e)
+{
+    System.err.println("Error: " + e.getMessage());
+}
+System.out.println("Person waiting time: "+(((Elevator)obj).get_tick()-tmpPer.get_request().get_tick()));
+/*
+try
+{
+    String content = Integer.toString((((Elevator)obj).get_tick()-tmpPer.get_request().get_tick()));
+    File file = new File("Datafile",ture);
+    if (!file.exists()) 
+    {
+				
+        file.createNewFile();
+	FileWriter fw = new FileWriter("Datafile",true);
+	BufferedWriter bw = new BufferedWriter(fw);
+        
+
+
+		bw.write(content,0,file.length);
+	
+ 
+        		
+    }
+    else  
+    {
+	FileWriter fw = new FileWriter(file.getAbsoluteFile());
+	BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(content);
+
+ 
+        System.out.println("Data written to file");
+        
+    }
+bw.close();
+}
+catch(IOException e)
+{
+    System.err.println("Error: " + e.getMessage());
+}
+*/
 ((Elevator)obj).Set_Persons(tmpPer);
                                             iterf.remove();
                                         }
@@ -450,7 +592,7 @@ System.out.println("Person waiting time: "+(((Elevator)obj).get_tick()-tmpPer.ge
                     building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Person)obj));//after request is added                                         
                     
                 System.out.println("People time:"+((Person)obj).get_tick());
-                System.out.println(" destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());                    
+                System.out.println("destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());                    
                     
                     
                     
@@ -526,7 +668,7 @@ p_queue.add((Request)obj);
 
     public static void main(String[] args)
     {
-        new Events().start();
+        new Events(args[0]).start();
     
     }
     
