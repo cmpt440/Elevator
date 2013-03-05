@@ -27,7 +27,7 @@ public class Infile
     public Infile(String file_name)
     {
         textfile=file_name;
-        read_file();
+        this.read_file();
     }
     
     public void get_data()
@@ -47,11 +47,13 @@ public class Infile
         }
         
         for(int x=0;x<opt.length;x++)
+        {
             for(String s:opt[x])
             {
                 if(s.compareToIgnoreCase("ElevatorCapacity") ==0 )
                 {
                     elevator_capacity = Integer.parseInt(opt[x][1]);
+
                 }
                 else if(s.compareToIgnoreCase("Floors") ==0 )
                 {
@@ -59,15 +61,15 @@ public class Infile
                 }
                 else if(s.compareToIgnoreCase("Idle") ==0 )
                 {
-                    idle = Integer.parseInt(opt[x][1]);
+                    idle = Integer.parseInt(opt[x][1]);                    
                 }
                 else if(s.compareToIgnoreCase("PickupDelay") ==0 )
                 {
-                    pick_up_delay= Integer.parseInt(opt[x][1]);
+                    pick_up_delay= Integer.parseInt(opt[x][1]);                    
                 }
                 else if(s.compareToIgnoreCase("Speed") ==0 )
                 {
-                 speed= Integer.parseInt(opt[x][1]);   
+                        speed= Integer.parseInt(opt[x][1]);   
                 }
                 else if(s.compareToIgnoreCase("Algorithm") ==0 )
                 {
@@ -81,16 +83,96 @@ public class Infile
                 
                 else if(s.compareToIgnoreCase("Birthofperson") ==0 )
                 {
-                    birthofperson= Integer.parseInt(opt[x][1]);
+                    birthofperson= Integer.parseInt(opt[x][1]);                                        
                 }
                 
                 else if(s.compareToIgnoreCase("placeofbirth") ==0 )
                 {
-                    placeofbirth= Integer.parseInt(opt[x][1]);
+                    placeofbirth= Integer.parseInt(opt[x][1]);                   
                 }
             }
         
+        }
+        
+                    //Events events=new Events();
+        
+                    if(placeofbirth<0)
+                    {
+                        System.err.println("Please enter spawn location within the range of floors.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    if(placeofbirth>floors)
+                    {
+                        System.err.println("Please enter spawn location within the range of floors.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    /*
+                    if(birthofperson>events.get_num_ticks())
+                    {
+                        System.err.println("Please enter spawn time less than ticks of simulation.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    * 
+                    */
+                    if(birthofperson<1)
+                    {
+                        System.err.println("Please enter spawn time greater than 0.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    if(elevators!=1)
+                    {
+                        System.err.println("Simulator can only run with 1 elevator.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    if(speed<1)
+                    {
+                        System.err.println("Please enter Elevator speed greater than 0.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    /*
+                    if(speed>events.get_num_ticks())
+                    {
+                        System.err.println("Please enter Elevator speed time less than ticks of simulation.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    * 
+                    */
+                    /*
+                    if(pick_up_delay>events.get_num_ticks())
+                    {
+                        System.err.println("Please enter delay time less than ticks of simulation.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    * 
+                    */
+                    if(pick_up_delay<0)
+                    {
+                        System.err.println("Please enter a delay greater than 0.\nPROGRAM EXITED.");
+                        System.exit(0);  
+                    }
+                    if(idle<0)
+                    {
+                        System.err.println("Please enter idle location within the range of floors.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    if(idle>floors)
+                    {
+                        System.err.println("Please enter idle location within the range of floors.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    if(floors<0)
+                    {
+                        System.err.println("Please enter floor number that is 0 or greater.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }
+                    if(elevator_capacity<1)
+                    {
+                        System.err.println("Please enter a capacity greater than 0.\nPROGRAM EXITED.");
+                        System.exit(0);
+                    }                
+
     }
+    
     
     public int get_place_of_birth()
     {
@@ -139,12 +221,16 @@ public class Infile
         return this.algorithm;
     }
     
+    public String get_file_name()
+    {
+        return this.textfile;
+    }
+    
     public void read_file()
     {
         
         try
-        {
-	    //System.out.println(System.getProperty("user.dir")+"\\"+textfile);
+        {	    
             FileInputStream fis=new FileInputStream(textfile);
             DataInputStream dis=new DataInputStream(fis);
             BufferedReader br=new BufferedReader(new InputStreamReader(dis));
@@ -155,7 +241,7 @@ public class Infile
         }
         catch(Exception e)
         {
-            
+            System.out.println(e);
         }
                 
         

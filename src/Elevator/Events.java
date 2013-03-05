@@ -12,12 +12,8 @@
  */
 package Elevator;
 import java.util.*;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.util.Random;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.*;
+
 
 
 public class Events 
@@ -27,11 +23,11 @@ public class Events
     private LinkedList[] building_floors;
     
     //speed of elevator
-    private int elevator_tick=3;
+    private int elevator_tick;
     //arrival of people
-    private int people_tick=2;
+    private int people_tick;
     //number of floors
-    private int floors = 7;   
+    private int floors;   
     private int tick;
     private String class_type;
     
@@ -57,6 +53,11 @@ public class Events
     
     private int num_of_ticks;
     
+    public Events()
+    {
+        
+    }
+    
     public Events(String file_name, String num_of_ticks)
     {
         this.num_of_ticks=Integer.parseInt(num_of_ticks);
@@ -65,16 +66,16 @@ public class Events
         infile.get_data();
         
         sim_tick = 0;
-e_algorithm_type = infile.get_algorithm();
-elevator_tick=infile.get_speed();
-building_floors = new LinkedList[infile.get_floors()];
+        e_algorithm_type = infile.get_algorithm();
+        elevator_tick=infile.get_speed();
+        building_floors = new LinkedList[infile.get_floors()];
         floors=infile.get_floors();
         
         //NEED TO EDIT
         dropofffloor= rand.nextInt(floors);
         
         wait_time=0;
-        divisor_for_average=0;
+        divisor_for_average=1;
         
         people_tick=infile.get_birth_of_person();
         elevators=infile.get_elevators();
@@ -98,7 +99,14 @@ building_floors = new LinkedList[infile.get_floors()];
         }
         //this.class_type="elevator";
     }
-    
+    public String get_file_name()
+    {
+        return this.infile.get_file_name();
+    }
+    public int get_num_ticks()
+    {
+        return this.num_of_ticks;
+    }
     //object that creates a person object that moves in the elevator
     public void set_floor_person_list(int floor, Person obj)
     {
@@ -532,10 +540,7 @@ divisor_for_average++;
                     //after request is added                                         
                    // System.out.println("People time:"+((Person)obj).get_tick())                ;
             }
-            
-               
-                
-   
+                                             
             else if(obj instanceof Create_class)
             {
                 if(((Create_class)obj).get_class_type().compareTo("people") == 0)
@@ -549,26 +554,19 @@ divisor_for_average++;
                 }
             }
             else if(obj instanceof Request)
-            {
-                
-                
+            {                                
                     Iterator it = p_queue.iterator();
                     Object elevator = null;
-//<editor-fold> 
                     while(it.hasNext())
                     {
                         elevator = it.next();
                         if(elevator instanceof Elevator)
                             break;
-                        //System.out.println(cur.getClass().getName() )                        ;
                     }
                     if(this.e_algorithm_type == 0)
                     {
                         if((Elevator)elevator instanceof Elevator)
-                        {
-
-                           // Elevator tmp = ((Elevator)it.next());
-                           // tmp.Set_Request(new Request(2));
+                        {                                                      
                             ((Elevator)elevator).Set_Request( ((Request)obj));
                         }
                     }
@@ -585,24 +583,25 @@ divisor_for_average++;
                             else
                             {
                                 ((Request)obj).set_tick(sim_tick+elevator_tick);
-
-p_queue.add((Request)obj);
+                                p_queue.add((Request)obj);
                             }
                         }
                     } 
-
-                    
-//</editor-fold>                 
+                                     
             }
         }
-        System.out.println("wait time average "+this.get_Average_person_wait_time()+" ticks");
+        
     }
          
 
     public static void main(String[] args)
     {
-        new Events(args[0], args[1]).start();
-    
+        Events event=new Events(args[0], args[1]);
+        System.out.println("\nParameters above taken from "+event.get_file_name());
+        System.out.println("***************************************************");
+        System.out.println("\nResults:");
+        event.start();   
+        System.out.println("wait time average "+event.get_Average_person_wait_time()+" ticks");
     }
     
     
