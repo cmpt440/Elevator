@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.*;
 
+
 public class Events 
 {
     private PriorityQueue<Object> p_queue;
@@ -33,6 +34,9 @@ public class Events
     private int floors = 7;   
     private int tick;
     private String class_type;
+    
+    private int wait_time;
+    private int divisor_for_average;
     
     private int e_algorithm_type;
     private Infile infile;
@@ -51,8 +55,12 @@ public class Events
     //parameter
     private int idle;
     
-    public Events(String file_name)
+    private int num_of_ticks;
+    
+    public Events(String file_name, String num_of_ticks)
     {
+        this.num_of_ticks=Integer.parseInt(num_of_ticks);
+        
         infile=new Infile(file_name);
         infile.get_data();
         
@@ -64,6 +72,9 @@ building_floors = new LinkedList[infile.get_floors()];
         
         //NEED TO EDIT
         dropofffloor= rand.nextInt(floors);
+        
+        wait_time=0;
+        divisor_for_average=0;
         
         people_tick=infile.get_birth_of_person();
         elevators=infile.get_elevators();
@@ -117,6 +128,12 @@ building_floors = new LinkedList[infile.get_floors()];
     public int get_elevator_tick()
     {
         return elevator_tick;
+    }
+    
+    //output stats
+    public int get_Average_person_wait_time()
+    {
+        return wait_time;
     }
     
     private void collective_up_collective_down(Object obj)
@@ -214,7 +231,7 @@ building_floors = new LinkedList[infile.get_floors()];
         p_queue.add(new Create_class("people", people_tick));
         Object obj;
         
-        while(p_queue.size()!=0)
+        while(sim_tick<num_of_ticks)
         {
             obj=p_queue.poll();
             
@@ -303,13 +320,20 @@ building_floors = new LinkedList[infile.get_floors()];
                                              this.building_floors[((Elevator)obj).Get_CurrentFloor()].add(tmpPer);
                                             iterf.remove();
                                         }
+                                        wait_time+=(((Elevator)obj).get_tick()-tmpPer.get_request().get_tick());
+                                        divisor_for_average++;
+                                        //System.out.println("wait time algorithm 0:"+wait_time);
                                         tmpPer = null;
                                     
                                 }
 
 
                             }
+                            //System.out.println(wait_time);
+                            //System.out.println("divisor"+divisor_for_average);
+                            
                         }
+                        
                         
                         //Collective up selective down
                         else if(e_algorithm_type == 1)
@@ -392,108 +416,16 @@ while(it1.hasNext())
     }
 }
 
-System.out.println("Elevator arrived at: "+((Elevator)obj).get_tick());
-/*
-try
-{
-    String content = Integer.toString(((Elevator)obj).get_tick());
-    File file = new File("Datafile",true);
-    if (!file.exists()) 
-    {
-				
-        file.createNewFile();
-	FileWriter fw = new FileWriter(file.getAbsoluteFile());
-	BufferedWriter bw = new BufferedWriter(fw);
-	
-	while(file)
-	{
-        	bw.write("Elevator arrived at: "+content);
-	}
- 
-        System.out.println("Data written to file");		
-    }
-    else
-    {
-	FileWriter fw = new FileWriter(file.getAbsoluteFile());
-	BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(content);
-	
- 
-        System.out.println("Data written to file");
-        
-    }
-}
-catch(IOException e)
-{
-    System.err.println("Error: " + e.getMessage());
-}
- */
-System.out.println("Request was made at: "+ tmpPer.get_request().get_tick());
-try
-{
-    String content = Integer.toString(tmpPer.get_request().get_tick());
-    File file = new File("Datafile");
-    if (!file.exists()) 
-    {
-				
-        file.createNewFile();
-	FileWriter fw = new FileWriter(file.getAbsoluteFile());
-	BufferedWriter bw = new BufferedWriter(fw);
-        bw.write("Request was made at: "+content);
-	
-        System.out.println("Data written to file");		
-    }
-    else
-    {
-	FileWriter fw = new FileWriter(file.getAbsoluteFile());
-	BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(content);
-	
+//System.out.println("Elevator arrived at: "+((Elevator)obj).get_tick());
 
-        
-    }
-}
-catch(IOException e)
-{
-    System.err.println("Error: " + e.getMessage());
-}
-System.out.println("Person waiting time: "+(((Elevator)obj).get_tick()-tmpPer.get_request().get_tick()));
-/*
-try
-{
-    String content = Integer.toString((((Elevator)obj).get_tick()-tmpPer.get_request().get_tick()));
-    File file = new File("Datafile",ture);
-    if (!file.exists()) 
-    {
-				
-        file.createNewFile();
-	FileWriter fw = new FileWriter("Datafile",true);
-	BufferedWriter bw = new BufferedWriter(fw);
-        
+//System.out.println("Request was made at: "+ tmpPer.get_request().get_tick());
 
 
-		bw.write(content,0,file.length);
-	
- 
-        		
-    }
-    else  
-    {
-	FileWriter fw = new FileWriter(file.getAbsoluteFile());
-	BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(content);
+wait_time+=(((Elevator)obj).get_tick()-tmpPer.get_request().get_tick());
+divisor_for_average++;
+//System.out.println("wait time algorithm 1:"+wait_time);
+//System.out.println(wait_time);
 
- 
-        System.out.println("Data written to file");
-        
-    }
-bw.close();
-}
-catch(IOException e)
-{
-    System.err.println("Error: " + e.getMessage());
-}
-*/
 ((Elevator)obj).Set_Persons(tmpPer);
                                             iterf.remove();
                                         }
@@ -504,12 +436,12 @@ catch(IOException e)
 
                             }
                 //floor traffic          
-                for(int i=0;i<=6;i++)
+                for(int i=0;i<floors;i++)
                     {
                       System.out.println("Traffic on floor "+ i+": "+building_floors[i].size());
                     }
                 //elevator traffic
-                System.out.println("Elevator currently contains : "+((Elevator)obj).Get_PersonsLinkedList().size());
+                //System.out.println("Elevator currently contains : "+((Elevator)obj).Get_PersonsLinkedList().size());
                 
                             //drop person off
                             if((elevReqs.get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor()) &&
@@ -551,7 +483,7 @@ catch(IOException e)
                         
                         
                     p_queue.add(obj);
-                    System.out.println("Elevator time:"+((Elevator)obj).get_tick()+", direction: "+((Elevator)obj).Get_direction() + ", Floor:"+((Elevator)obj).Get_CurrentFloor());                ;
+                    //System.out.println("Elevator time:"+((Elevator)obj).get_tick()+", direction: "+((Elevator)obj).Get_direction() + ", Floor:"+((Elevator)obj).Get_CurrentFloor());                ;
             }
             if(obj instanceof Person)
             {
@@ -591,14 +523,14 @@ catch(IOException e)
 
                     building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Person)obj));//after request is added                                         
                     
-                System.out.println("People time:"+((Person)obj).get_tick());
-                System.out.println("destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());                    
+                //System.out.println("People time:"+((Person)obj).get_tick());
+                //System.out.println("destination: "+((Person)obj).get_request().get_to_floor_request() + ", Floor:"+((Person)obj).get_current_floor());                    
                     
                     
                     
                     
                     //after request is added                                         
-                    System.out.println("People time:"+((Person)obj).get_tick())                ;
+                   // System.out.println("People time:"+((Person)obj).get_tick())                ;
             }
             
                
@@ -663,12 +595,13 @@ p_queue.add((Request)obj);
 //</editor-fold>                 
             }
         }
+        System.out.println("wait time average "+wait_time/divisor_for_average+" ticks");
     }
          
 
     public static void main(String[] args)
     {
-        new Events(args[0]).start();
+        new Events(args[0], args[1]).start();
     
     }
     
