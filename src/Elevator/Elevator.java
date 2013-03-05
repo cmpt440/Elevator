@@ -76,6 +76,20 @@ public class Elevator implements Comparable
         return (Request)requestQueue.peek();
     }
     * */
+    public boolean Half_Increment()
+    {
+        boolean result = true;
+        
+        if(currentFloor + 1 < (floors/2))
+            currentFloor +=1;
+        else
+        {
+            direction = false;
+            return false;
+        }
+        
+        return result;
+    }
     
     public boolean Increment()
     {

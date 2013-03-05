@@ -18,6 +18,7 @@ import java.util.Random;
 
 public class Events 
 {
+    boolean alternate;
     private PriorityQueue<Object> p_queue;
     private int sim_tick;
     private LinkedList[] building_floors;    
@@ -63,6 +64,7 @@ public class Events
     
     public Events(String file_name, String num_of_ticks)
     {
+        alternate=false;
         this.num_of_ticks=Integer.parseInt(num_of_ticks);
         
         infile=new Infile(file_name);
@@ -172,6 +174,7 @@ public class Events
                     }   
         
     }
+    
     //need to modify
     private void collective_up_selective_down(Object obj)
     {
@@ -228,6 +231,47 @@ public class Events
         
     }
     
+    private void custom_algorithm(Object obj)
+    {
+        if (alternate==false)
+        {
+                    if(((Elevator)obj).Get_direction() == true)
+                    {
+                        if(((Elevator)obj).Half_Increment() == false)
+                        {
+                            ((Elevator)obj).Decrement();
+                        }
+                    }
+                    else if(((Elevator)obj).Get_direction() == false)
+                    {
+                        if(((Elevator)obj).Decrement() == false)
+                        {
+                            ((Elevator)obj).Increment();
+                            alternate=true;
+                        }
+                    } 
+        }
+        else
+        {
+        
+        
+                    if(((Elevator)obj).Get_direction() == true)
+                    {
+                        if(((Elevator)obj).Increment() == false)
+                        {
+                            ((Elevator)obj).Decrement();
+                        }
+                    }
+                    else if(((Elevator)obj).Get_direction() == false)
+                    {
+                        if(((Elevator)obj).Decrement() == false)
+                        {
+                            ((Elevator)obj).Half_Increment();
+                            alternate=false;
+                        }
+                    }   
+        }
+    }
     
     //method to generate random number
     int random_generator(int num_to_avoid)
@@ -265,7 +309,9 @@ public class Events
                          case 1:
                             collective_up_selective_down(obj);
                             break;
-                            
+                        case 2:
+                            custom_algorithm(obj);
+                            break;    
                         default:
                             collective_up_collective_down(obj);
                             break;
@@ -492,6 +538,69 @@ divisor_for_average++;
                             
                             
                         }
+                        else //custom algorithm
+                        if(e_algorithm_type == 2)
+                        {
+                            //pickup
+                            if(elevReqs.get_from_floor_request() == ((Elevator)obj).Get_CurrentFloor())
+                            {
+                                Iterator iterf;
+                                iterf = this.building_floors[((Elevator)obj).Get_CurrentFloor()].iterator();
+
+                                Person tmpPer;
+                                //Request perReq;
+                                
+
+                                //iterate the persons on the floor
+                                while(iterf.hasNext())
+                                {
+                                        tmpPer = (Person)iterf.next();
+                                        if(tmpPer.get_request().get_from_floor_request() == ((Elevator)obj).Get_CurrentFloor())
+                                        {
+                                            
+                                            ((Elevator)obj).Set_Persons(tmpPer);
+                                            
+                                            iterf.remove();
+                                        }
+                                        tmpPer = null;
+                                    
+                                }
+
+
+                            }
+                            
+                            //drop person off
+                            if((elevReqs.get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor()) && (((Elevator)obj).Get_PersonsLinkedList().size() > 0))
+                            {
+                                Iterator iterf;
+                                iterf = ((Elevator)obj).Get_PersonsIterator();
+
+                                Person tmpPer;
+                                //Request perReq;
+                                
+
+                                //iterate the persons on the floor
+                                while(iterf.hasNext())
+                                {
+                                        tmpPer = (Person)iterf.next();
+                                        if(tmpPer.get_request().get_to_floor_request() == ((Elevator)obj).Get_CurrentFloor())
+                                        {
+                                             this.building_floors[((Elevator)obj).Get_CurrentFloor()].add(tmpPer);
+                                            iterf.remove();
+                                        }
+                                        wait_time+=(((Elevator)obj).get_tick()-tmpPer.get_request().get_tick());
+                                        divisor_for_average++;
+                                        //System.out.println("wait time algorithm 0:"+wait_time);
+                                        tmpPer = null;
+                                    
+                                }
+
+
+                            }
+                            //System.out.println(wait_time);
+                            //System.out.println("divisor"+divisor_for_average);
+                            
+                        }
                     }
 //*************************                            
 
@@ -538,7 +647,7 @@ divisor_for_average++;
                     ((Person)obj).set_request(personRequest);
                     p_queue.add(elevRequest);
                     //put person on the floor linklist
-//building_floors[((Person)obj).get_destination_floor()].add(((Person)obj));
+                    //building_floors[((Person)obj).get_destination_floor()].add(((Person)obj));
 
                     building_floors[((Person)obj).get_request().get_from_floor_request()].add(((Person)obj));//after request is added                                         
                     
